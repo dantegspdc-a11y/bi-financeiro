@@ -53,6 +53,10 @@ export let baseContasReceber = [];
 export let baseContasPagar = [];
 export let totalRegistrosBrutos = 0;
 
+// Lookup Maps (O(1)) para performance em grandes volumes
+export let fatMap = new Map();
+export let recMap = new Map();
+
 // Normalization function
 export function parseMoeda(valor) {
   if (valor === null || valor === undefined) return 0;
@@ -211,6 +215,11 @@ export async function carregarDados() {
   baseContasReceber = receberFinal;
   baseContasPagar = pagarNormalized;
   totalRegistrosBrutos = rawFaturamento.length;
+
+  // Atualizar mapas de lookup para uso global
+  fatMap = faturamentoValidoMap;
+  recMap = new Map();
+  baseContasReceber.forEach(r => recMap.set(String(r.reserva), r));
   
   console.log(`✅ BI Atualizado: ${baseFaturamento.length} faturamentos | ${baseContasReceber.length} receber | ${baseContasPagar.length} pagar`);
   console.timeEnd('⏱️ carregarDados total');
@@ -333,12 +342,8 @@ export function reconciliarDados(filtros = {}) {
   if (filtros.status) dados = dados.filter(d => d.status_faturamento === String(filtros.status).toUpperCase());
   if (filtros.reserva) dados = dados.filter(d => d.reserva.toLowerCase().includes(filtros.reserva.toLowerCase()));
 
-  // Criar mapa de contas a receber por reserva (O(1) lookup ao invés de O(n) .find())
-  const receberMap = new Map();
-  for (let i = 0; i < baseContasReceber.length; i++) {
-    const r = baseContasReceber[i];
-    receberMap.set(String(r.reserva), r);
-  }
+  // Usar mapa global pré-calculado para performance O(1)
+  const receberMap = recMap;
 
   return dados.map(fat => {
     const receber = receberMap.get(String(fat.reserva));

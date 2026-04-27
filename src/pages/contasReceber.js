@@ -10,7 +10,7 @@ import {
   getContasReceberComStatus, filtrarContasReceber, formatarMoeda, formatarData, formatarPct,
   agruparPor, agruparPorMes, baseContasReceber, baseFaturamento, getTopDevedores, calcularAgingReceber,
   getAgingMedio, getPrazoMedio,
-  getCompetencias, getClientes, getCategorias,
+  getCompetencias, getClientes, getCategorias, fatMap,
 } from '../data/businessLogic.js';
 
 let currentFilters = {};
@@ -18,10 +18,7 @@ let currentFilters = {};
 function getEnrichedContas(filtros = {}) {
   const rawContas = filtros && Object.keys(filtros).length > 0 ? filtrarContasReceber(filtros) : getContasReceberComStatus();
   
-  const faturamentoMap = new Map();
-  baseFaturamento.forEach(f => {
-    faturamentoMap.set(String(f.reserva), f);
-  });
+  const faturamentoMap = fatMap;
 
   return rawContas.map(c => {
     const reservaKey = String(c.reserva);
@@ -160,7 +157,8 @@ export function init() {
     datasets: [{ label: 'Valor', data: Object.values(aging), color: '#ef4444' }],
   });
 
-  initTableInteractions('table-receber');
+  const { columns, contas: finalRows } = buildContent(currentFilters);
+  initTableInteractions('table-receber', columns, finalRows);
   initFilterBar('filter-cr', (filtros) => {
     currentFilters = filtros;
     const content = document.getElementById('cr-content');
@@ -177,7 +175,8 @@ export function init() {
         <div class="section-title">Detalhamento Completo</div>
         ${renderDataTable({ id: 'table-receber', title: 'Contas a Receber — Detalhado', columns, rows: contas })}
       `;
-      init(); // Reinicializa os gráficos e eventos da tabela
+      initTableInteractions('table-receber', columns, contas);
+      init(); // Reinicializa os gráficos
     }
   });
 }

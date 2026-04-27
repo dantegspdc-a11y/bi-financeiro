@@ -117,7 +117,8 @@ export function init() {
     datasets: [{ label: 'Valor', data: Object.values(aging), color: '#ef4444' }],
   });
 
-  initTableInteractions('table-pagar');
+  const { columns, contas: finalRows } = buildContent(currentFilters);
+  initTableInteractions('table-pagar', columns, finalRows);
   initFilterBar('filter-cp', (filtros) => {
     currentFilters = filtros;
     const content = document.getElementById('cp-content');
@@ -125,6 +126,13 @@ export function init() {
       const { kpiCards } = buildContent(filtros);
       const kpiEl = content.querySelector('.kpi-grid');
       if (kpiEl) kpiEl.outerHTML = renderKPIGrid(kpiCards);
+      
+      const { columns, contas } = buildContent(filtros);
+      const tableArea = content.querySelector('.table-card');
+      if (tableArea) {
+        tableArea.outerHTML = renderDataTable({ id: 'table-pagar', title: 'Contas a Pagar — Detalhado', columns, rows: contas });
+        initTableInteractions('table-pagar', columns, contas);
+      }
     }
   });
 }
