@@ -192,79 +192,23 @@ export async function carregarDados() {
     });
   }
 
-  // ---- PASSO 5: Corrigir valor_receber e valor_pago zerados cruzando com faturamento ----
-  // Quando título foi recebido/baixado mas o valor a receber/pago é 0,
-  // buscar valor no faturamento (total_a_receber_cliente ou total_cliente).
-  // IMPORTANTE: Se houver múltiplas parcelas zeradas para a mesma reserva,
-  // dividir o valor do faturamento igualmente entre elas.
-  
-  // 5a. Contar parcelas zeradas por reserva (apenas as que precisam de correção)
-  const parcelasZeradasPorReserva = new Map();
-  for (const rec of receberNormalizados) {
-    if (rec._foi_recebido && rec.valor_receber <= 0 && rec.reserva) {
-      const key = rec.reserva;
-      if (!parcelasZeradasPorReserva.has(key)) {
-        parcelasZeradasPorReserva.set(key, { count: 0 });
-      }
-      parcelasZeradasPorReserva.get(key).count += 1;
+  // ---- PASSO 5: Finalizar base de Contas a Receber ----
+  const receberFinal = receberNormalizados.map(rec => {
+    // Se o título foi recebido mas o valor_pago está zerado, assumir que o valor pago foi o total a receber
+    if (rec._foi_recebido && rec.valor_pago <= 0 && rec.valor_receber > 0) {
+      return {
+        ...rec,
+        valor_pago: rec.valor_receber,
+        aberto: 0
+      };
     }
-  }
-
-  // 5b. Aplicar correção
-  let correcoes = 0;
-  const receberEnriquecido = receberNormalizados.map(rec => {
-    // Se o título não foi baixado/recebido, manter como está
-    if (!rec._foi_recebido) return rec;
-
-    // Se valor_receber > 0, usar ele.
-    // Mas se for baixado e valor_pago estiver 0, preencher valor_pago com valor_receber
-    if (rec.valor_receber > 0) {
-      if (rec._valor_pago_original <= 0) {
-        return {
-          ...rec,
-          valor_pago: rec.valor_receber,
-          aberto: 0
-        };
-      }
-      return rec;
-    }
-
-    // Se chegou aqui, _foi_recebido é true e valor_receber <= 0
-    // Aplicar cruzamento com faturamento
-    if (!rec.reserva) return rec;
-
-    const fatValidoEntry = faturamentoValidoMap.get(rec.reserva);
-    if (!fatValidoEntry) return rec;
-
-    // Buscar valor: primeiro total_a_receber_cliente, senão total_cliente
-    let valorFat = parseMoeda(fatValidoEntry.total_a_receber_cliente);
-    if (!valorFat || valorFat <= 0) {
-      valorFat = parseMoeda(fatValidoEntry.total_cliente);
-    }
-    if (!valorFat || valorFat <= 0) return rec;
-
-    // Distribuir igualmente entre parcelas zeradas da mesma reserva
-    const info = parcelasZeradasPorReserva.get(rec.reserva);
-    let valorCorrigido = valorFat / (info ? info.count : 1);
-
-    correcoes++;
-    return {
-      ...rec,
-      valor_receber: valorCorrigido,
-      valor_pago: valorCorrigido,
-      aberto: 0,
-      _corrigido_via_faturamento: true
-    };
+    return rec;
   });
-
-  if (correcoes > 0) {
-    console.log(`🔧 Valor recebido corrigido via faturamento em ${correcoes} títulos`);
-  }
 
   console.timeEnd('⏱️ processamento');
 
   baseFaturamento = faturamentoNormalized;
-  baseContasReceber = receberEnriquecido;
+  baseContasReceber = receberFinal;
   baseContasPagar = pagarNormalized;
   totalRegistrosBrutos = rawFaturamento.length;
   

@@ -72,7 +72,7 @@ const mapReceber = {
   "Vendas (Dt.Emissão)": "vendas_dt_emissao",
   "Dt.Vencimento": "dt_vencimento",
   "Vendas (Reserva)": "vendas_reserva",
-  "Vendas (Total a Receber Cliente)": "vendas_total_receber_cliente",
+  "Valor Venda": "vendas_total_receber_cliente",
   "Vendas (Emissor)": "vendas_emissor",
   "Vendas (Usuário Criação Reserva)": "vendas_usuario_criacao_reserva",
   "Vendas (Produto)": "vendas_produto",
