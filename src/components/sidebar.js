@@ -2,6 +2,8 @@
 // SIDEBAR COMPONENT — with logo support
 // ============================================================
 
+import logoInovve from '../assets/logo.png';
+
 const ICONS = {
   dashboard: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>`,
   fileText: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`,
@@ -22,19 +24,13 @@ const NAV_ITEMS = [
   { id: 'importar-bases', label: 'Importar Bases', icon: 'uploadCloud' },
 ];
 
-// Logo is stored in localStorage as base64
+// Logo is stored in localStorage as base64 or defaults to assets logo
 function getLogoHtml() {
   const logoData = localStorage.getItem('bi_empresa_logo');
   if (logoData) {
     return `<img src="${logoData}" alt="Logo da empresa" class="sidebar-logo-img" id="sidebar-logo-img" />`;
   }
-  return `
-    <div class="sidebar-logo-fallback">
-      <div class="sidebar-logo-icon">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="url(#grad)" stroke-width="2"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#6366f1"/><stop offset="100%" style="stop-color:#8b5cf6"/></linearGradient></defs><rect x="2" y="3" width="20" height="18" rx="3"/><path d="M8 7h8M8 11h5M8 15h8"/></svg>
-      </div>
-    </div>
-  `;
+  return `<img src="${logoInovve}" alt="Logo Inovve" class="sidebar-logo-img" id="sidebar-logo-img" />`;
 }
 
 /** Refresh sidebar logo after upload/remove */
@@ -53,7 +49,7 @@ export function renderSidebar(activePage) {
           ${getLogoHtml()}
         </div>
         <div class="sidebar-brand-text">
-          <h1>BI Financeiro</h1>
+          <h1>INOVVE.GO</h1>
           <span>Painel Executivo</span>
         </div>
       </div>

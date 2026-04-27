@@ -3,6 +3,7 @@
 // ============================================================
 
 import { createBarChart, createLineChart, destroyAllCharts } from '../components/chartHelpers.js';
+import logoInovve from '../assets/logo.png';
 import {
   calcularKPIs, calcularFluxoCaixa, reconciliarDados, calcularComparativo,
   formatarMoeda, formatarPct, getContasReceberComStatus, getContasPagarComStatus,
@@ -45,7 +46,7 @@ export function render() {
     <div class="page-enter report-page" id="report-page">
       <div class="report-header">
         <div class="report-logo-area" id="report-logo-area"></div>
-        <div class="report-company-name" style="font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;">EMPRESA S/A</div>
+        <div class="report-company-name" style="font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;">INOVVE.GO</div>
         <h1>Relatório Executivo Financeiro</h1>
         <p>Gerado em ${dateStr} — Dados Consolidados</p>
         <div class="report-actions mt-4">
@@ -182,7 +183,7 @@ export function init() {
   // Insert logo into report
   const logoArea = document.getElementById('report-logo-area');
   const storedLogo = localStorage.getItem('bi_empresa_logo');
-  if (logoArea && storedLogo) {
-    logoArea.innerHTML = `<img src="${storedLogo}" alt="Logo" class="report-logo" />`;
+  if (logoArea) {
+    logoArea.innerHTML = `<img src="${storedLogo || logoInovve}" alt="Logo" class="report-logo" />`;
   }
 }
