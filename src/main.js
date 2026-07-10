@@ -26,7 +26,13 @@ const PAGES = {
   'importar-bases': importarBases,
 };
 
+const KIOSK_PAGES = ['visao-geral', 'a-faturar', 'contas-receber', 'contas-pagar', 'fluxo-caixa'];
+const KIOSK_INTERVAL_MS = 8000; // 8 segundos por página
+
 let currentPage = 'visao-geral';
+let kioskTimer = null;
+let kioskIndex = 0;
+let kioskProgressTimer = null;
 
 
 function getPageFromHash() {
@@ -46,6 +52,10 @@ function renderLayout() {
             <h2 class="header-title" id="header-title">${getPageTitle(currentPage)}</h2>
           </div>
           <div class="header-filters" id="header-filters">
+            <button class="btn btn-outline btn-sm" id="btn-kiosk" title="Modo Quiosque — rotação automática de páginas">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              Quiosque
+            </button>
             <span class="header-timestamp">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
               ${new Date().toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
@@ -98,10 +108,117 @@ function attachNavListeners() {
   });
 }
 
+// ============================================================
+// MODO QUIOSQUE
+// ============================================================
+
+function startKiosk() {
+  kioskIndex = KIOSK_PAGES.indexOf(currentPage);
+  if (kioskIndex < 0) kioskIndex = 0;
+
+  document.body.classList.add('kiosk-mode');
+
+  // Inject overlay bar
+  let bar = document.getElementById('kiosk-bar');
+  if (!bar) {
+    bar = document.createElement('div');
+    bar.id = 'kiosk-bar';
+    bar.innerHTML = `
+      <div class="kiosk-bar-inner">
+        <div class="kiosk-bar-left">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          <span>Modo Quiosque</span>
+          <span class="kiosk-page-label" id="kiosk-page-label"></span>
+        </div>
+        <div class="kiosk-bar-right">
+          <button id="btn-kiosk-stop" class="btn btn-sm" style="background:var(--accent-red);color:#fff;border:none;">✕ Sair</button>
+        </div>
+      </div>
+      <div class="kiosk-progress"><div class="kiosk-progress-fill" id="kiosk-progress-fill"></div></div>
+    `;
+    document.body.appendChild(bar);
+    document.getElementById('btn-kiosk-stop').addEventListener('click', stopKiosk);
+  }
+  bar.style.display = 'block';
+
+  kioskShowPage();
+
+  kioskTimer = setInterval(() => {
+    kioskIndex = (kioskIndex + 1) % KIOSK_PAGES.length;
+    kioskShowPage();
+  }, KIOSK_INTERVAL_MS);
+
+  // ESC to exit
+  document.addEventListener('keydown', kioskEscHandler);
+}
+
+function kioskShowPage() {
+  renderPage(KIOSK_PAGES[kioskIndex]);
+  updateKioskLabel();
+  startKioskProgress();
+  kioskAutoScroll();
+}
+
+let kioskScrollTimer = null;
+
+function kioskAutoScroll() {
+  // Clear any pending scroll timer
+  if (kioskScrollTimer) { clearTimeout(kioskScrollTimer); kioskScrollTimer = null; }
+
+  const content = document.getElementById('content');
+  if (!content) return;
+
+  // Start at top
+  content.scrollTo({ top: 0, behavior: 'instant' });
+
+  // After half the time, scroll smoothly to the bottom
+  kioskScrollTimer = setTimeout(() => {
+    const scrollTarget = content.scrollHeight - content.clientHeight;
+    if (scrollTarget > 0) {
+      content.scrollTo({ top: scrollTarget, behavior: 'smooth' });
+    }
+  }, KIOSK_INTERVAL_MS / 2);
+}
+
+function updateKioskLabel() {
+  const label = document.getElementById('kiosk-page-label');
+  if (label) label.textContent = `— ${getPageTitle(KIOSK_PAGES[kioskIndex])} (${kioskIndex + 1}/${KIOSK_PAGES.length})`;
+}
+
+function startKioskProgress() {
+  const fill = document.getElementById('kiosk-progress-fill');
+  if (!fill) return;
+  // Reset animation
+  fill.style.transition = 'none';
+  fill.style.width = '0%';
+  // Force reflow
+  fill.offsetWidth;
+  fill.style.transition = `width ${KIOSK_INTERVAL_MS}ms linear`;
+  fill.style.width = '100%';
+}
+
+function stopKiosk() {
+  document.body.classList.remove('kiosk-mode');
+  if (kioskTimer) { clearInterval(kioskTimer); kioskTimer = null; }
+  if (kioskScrollTimer) { clearTimeout(kioskScrollTimer); kioskScrollTimer = null; }
+  const bar = document.getElementById('kiosk-bar');
+  if (bar) bar.style.display = 'none';
+  document.removeEventListener('keydown', kioskEscHandler);
+}
+
+function kioskEscHandler(e) {
+  if (e.key === 'Escape') stopKiosk();
+}
+
 async function init() {
   currentPage = getPageFromHash();
   renderLayout();
   attachNavListeners();
+
+  // Kiosk button
+  document.getElementById('btn-kiosk')?.addEventListener('click', () => {
+    if (kioskTimer) { stopKiosk(); } else { startKiosk(); }
+  });
 
   const content = document.getElementById('content');
   if (content) {
