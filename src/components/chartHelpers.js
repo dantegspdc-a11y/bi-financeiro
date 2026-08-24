@@ -41,22 +41,21 @@ export function destroyChart(id) {
 }
 
 const CHART_COLORS = {
-  indigo: '#6366f1', purple: '#8b5cf6', blue: '#3b82f6', cyan: '#06b6d4',
-  emerald: '#10b981', amber: '#f59e0b', red: '#ef4444', rose: '#f43f5e',
-  gray: '#64748b', teal: '#14b8a6', orange: '#f97316', lime: '#84cc16',
+  indigo: '#818cf8', purple: '#a78bfa', blue: '#60a5fa', cyan: '#22d3ee',
+  emerald: '#34d399', amber: '#fbbf24', red: '#f87171', rose: '#fb7185',
+  gray: '#94a3b8', teal: '#2dd4bf', orange: '#fb923c', lime: '#a3e635',
 };
 
 // Helper to create a premium gradient
 function createPremiumGradient(ctx, colorHex) {
-  // Extract RGB to make a soft gradient
   const hex = colorHex.replace('#', '');
   const r = parseInt(hex.substring(0,2), 16);
   const g = parseInt(hex.substring(2,4), 16);
   const b = parseInt(hex.substring(4,6), 16);
   
   const gradient = ctx.createLinearGradient(0, 0, 400, 0); // Horizontal gradient
-  gradient.addColorStop(0, `rgba(${r},${g},${b},0.6)`);
-  gradient.addColorStop(1, `rgba(${r},${g},${b},1)`);
+  gradient.addColorStop(0, `rgba(${r},${g},${b},0.4)`);
+  gradient.addColorStop(1, `rgba(${r},${g},${b},0.95)`);
   return gradient;
 }
 
@@ -73,8 +72,8 @@ const CHART_DEFAULTS = {
       },
     },
     tooltip: {
-      backgroundColor: '#1e293b', titleColor: '#f8fafc', bodyColor: '#cbd5e1',
-      borderColor: '#334155', borderWidth: 1, cornerRadius: 8, padding: 12,
+      backgroundColor: 'rgba(5, 6, 8, 0.95)', titleColor: '#ffffff', bodyColor: '#cbd5e1',
+      borderColor: 'rgba(255, 255, 255, 0.08)', borderWidth: 1, cornerRadius: 10, padding: 12,
       titleFont: { family: "'Inter', sans-serif", weight: '600', size: 12 },
       bodyFont: { family: "'Inter', sans-serif", size: 11 },
       callbacks: {
@@ -88,19 +87,19 @@ const CHART_DEFAULTS = {
   },
   scales: {
     x: {
-      ticks: { color: '#64748b', font: { family: "'Inter', sans-serif", size: 10 } },
-      grid: { color: 'rgba(51,65,85,.4)', drawBorder: false },
+      ticks: { color: '#94a3b8', font: { family: "'Inter', sans-serif", size: 10 } },
+      grid: { color: 'rgba(255, 255, 255, 0.04)', drawBorder: false },
     },
     y: {
       ticks: {
-        color: '#64748b', font: { family: "'Inter', sans-serif", size: 10 },
+        color: '#94a3b8', font: { family: "'Inter', sans-serif", size: 10 },
         callback: function(v) {
           if (v >= 1000000) return `${(v / 1000000).toFixed(1)}M`;
           if (v >= 1000) return `${(v / 1000).toFixed(0)}K`;
           return v;
         }
       },
-      grid: { color: 'rgba(51,65,85,.4)', drawBorder: false },
+      grid: { color: 'rgba(255, 255, 255, 0.04)', drawBorder: false },
     },
   },
 };
@@ -164,7 +163,7 @@ export function createDoughnutChart(canvasId, { labels, data, colors }) {
     type: 'doughnut',
     data: {
       labels,
-      datasets: [{ data, backgroundColor: colors || Object.values(CHART_COLORS).slice(0, data.length), borderColor: '#1e293b', borderWidth: 3, hoverOffset: 6 }],
+      datasets: [{ data, backgroundColor: colors || Object.values(CHART_COLORS).slice(0, data.length), borderColor: 'transparent', borderWidth: 3, hoverOffset: 6 }],
     },
     options: {
       responsive: true, maintainAspectRatio: false, cutout: '70%',

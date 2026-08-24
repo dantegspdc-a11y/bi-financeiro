@@ -46,5 +46,6 @@ export function renderKPICard({ label, value, sub, color = 'indigo', icon = 'mon
 }
 
 export function renderKPIGrid(cards) {
-  return `<div class="kpi-grid">${cards.map(c => renderKPICard(c)).join('')}</div>`;
+  const isSeven = cards.length === 7;
+  return `<div class="${isSeven ? 'kpi-grid-7' : 'kpi-grid'}">${cards.map(c => renderKPICard(c)).join('')}</div>`;
 }
