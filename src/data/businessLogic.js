@@ -111,15 +111,25 @@ function normalizeReceber(d) {
 
 function normalizePagar(d) {
   const vPag = parseMoeda(d.valor_parcela);
-  const vPago = parseMoeda(d.valor_pago);
+  let vPago = parseMoeda(d.valor_pago);
+
+  const situacaoUpper = String(d.situacao || '').trim().toUpperCase();
+  const foiPago = situacaoUpper === 'PAGO' || !!d.dt_baixa;
+
+  if (foiPago && vPago <= 0 && vPag > 0) {
+    vPago = vPag;
+  }
+
+  const aberto = foiPago ? 0 : Math.max(0, vPag - vPago);
+
   return {
     ...d,
     data_emissao: d.dt_emissao,
     data_vencimento: d.dt_vencimento,
     valor_pagar: vPag,
     valor_pago: vPago,
-    aberto: vPag - vPago,
-    competencia: d.dt_vencimento ? d.dt_vencimento.slice(0, 7) : '2026-04'
+    aberto: aberto,
+    competencia: d.dt_vencimento ? String(d.dt_vencimento).slice(0, 7) : '2026-04'
   };
 }
 
@@ -655,12 +665,13 @@ export function getContasReceberComStatus() {
 export function getContasPagarComStatus() {
   const hoje = new Date().toISOString().slice(0, 10);
   return baseContasPagar.map(p => {
-    const aberto = p.valor_pagar - (p.valor_pago || 0);
+    const situacaoUpper = String(p.situacao || '').trim().toUpperCase();
+    const foiPago = situacaoUpper === 'PAGO' || !!p.dt_baixa || (p.aberto <= 0 && p.valor_pagar > 0);
     let status;
-    if (aberto <= 0) status = 'Pago';
+    if (foiPago) status = 'Pago';
     else if (p.data_vencimento < hoje) status = 'Vencido';
     else status = 'A vencer';
-    return { ...p, status, aberto, dias: Math.ceil((parsarData(p.data_vencimento) - parsarData(hoje)) / (1000 * 60 * 60 * 24)) };
+    return { ...p, status, aberto: foiPago ? 0 : p.aberto, dias: Math.ceil((parsarData(p.data_vencimento) - parsarData(hoje)) / (1000 * 60 * 60 * 24)) };
   });
 }
 

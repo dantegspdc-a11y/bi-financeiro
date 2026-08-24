@@ -150,17 +150,27 @@ async function processExcelFile(file, typeMap, label, tableName, progressCallbac
         if (progressCallback) progressCallback('Processando dados...');
         await new Promise(r => setTimeout(r, 50));
         
-        const json = XLSX.utils.sheet_to_json(sheet, { range: 1, raw: true });
-        
+        let json = XLSX.utils.sheet_to_json(sheet, { range: 0, raw: true });
+        let fileHeaders = json.length > 0 ? Object.keys(json[0]) : [];
+        const expectedKeys = Object.keys(typeMap);
+
+        let matchCount0 = expectedKeys.filter(k => fileHeaders.includes(k)).length;
+
+        const json1 = XLSX.utils.sheet_to_json(sheet, { range: 1, raw: true });
+        let fileHeaders1 = json1.length > 0 ? Object.keys(json1[0]) : [];
+        let matchCount1 = expectedKeys.filter(k => fileHeaders1.includes(k)).length;
+
+        if (matchCount1 > matchCount0) {
+          json = json1;
+          fileHeaders = fileHeaders1;
+        }
+
         const mappedData = [];
         let missingColumns = [];
 
-        if (json.length > 0) {
-          const fileHeaders = Object.keys(json[0]);
-          for (const expectedKey of Object.keys(typeMap)) {
-            if (!fileHeaders.includes(expectedKey)) {
-              missingColumns.push(expectedKey);
-            }
+        for (const expectedKey of expectedKeys) {
+          if (!fileHeaders.includes(expectedKey)) {
+            missingColumns.push(expectedKey);
           }
         }
 
