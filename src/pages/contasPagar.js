@@ -33,7 +33,7 @@ function buildContent(filtros = {}) {
     { label: 'Total Vencido', value: totalVencido, color: 'red', icon: 'alert', sub: `${vencidos.length} documentos` },
     { label: '% Pago', value: formatarPct(pctPago), color: 'cyan', icon: 'percent', isCurrency: false, sub: 'do total' },
     { label: 'Aging Médio', value: `${agingMedio} dias`, color: 'amber', icon: 'calendar', isCurrency: false, sub: 'vencidos em aberto' },
-    { label: 'Prazo Médio', value: `${prazoMedio} dias`, color: 'blue', icon: 'calendar', isCurrency: false, sub: 'até vencimento' },
+    { label: 'Prazo Médio', value: `${prazoMedio} dias`, color: 'blue', icon: 'calendar', isCurrency: false, sub: 'emissão ao vencimento' },
   ];
 
   const badgeStatus = (s) => `<span class="badge ${s === 'Vencido' ? 'badge-vencido' : s === 'Pago' ? 'badge-ok' : 'badge-avencer'}">${s}</span>`;

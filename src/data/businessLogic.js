@@ -563,15 +563,27 @@ export function getAgingMedio(contas, campoVencimento, campoValor, campoPago) {
   return count > 0 ? Math.round(totalDias / count) : 0;
 }
 
-export function getPrazoMedio(contas, campoVencimento, campoEmissao) {
-  if (contas.length === 0) return 0;
+export function getPrazoMedio(contas, campoVencimento = 'data_vencimento', campoEmissao = 'data_emissao') {
+  if (!contas || contas.length === 0) return 0;
   let totalDias = 0;
-  const hoje = new Date();
+  let count = 0;
+  
   contas.forEach(c => {
-    const venc = parsarData(c[campoVencimento]);
-    totalDias += Math.ceil((venc - hoje) / (1000 * 60 * 60 * 24));
+    const dataVenc = c[campoVencimento];
+    const dataEmiss = c[campoEmissao] || c.dt_emissao || c.vendas_dt_emissao || c.data_emissao;
+    
+    if (dataVenc && dataEmiss) {
+      const venc = parsarData(dataVenc);
+      const emiss = parsarData(dataEmiss);
+      const diff = Math.ceil((venc - emiss) / (1000 * 60 * 60 * 24));
+      if (!isNaN(diff) && diff >= 0) {
+        totalDias += diff;
+        count++;
+      }
+    }
   });
-  return Math.round(totalDias / contas.length);
+
+  return count > 0 ? Math.round(totalDias / count) : 0;
 }
 
 // ---------- DESTAQUES EXECUTIVOS ----------
