@@ -30,6 +30,12 @@ export function renderKPICard({ label, value, sub, color = 'indigo', icon = 'mon
     </div>
   ` : '';
 
+  const sparklinePath = color === 'red' 
+    ? 'M 0 6 C 20 14, 40 8, 55 22 C 65 24, 72 20, 80 28'
+    : (color === 'amber'
+      ? 'M 0 16 C 20 22, 35 12, 50 18 C 65 14, 72 16, 80 8'
+      : 'M 0 24 C 20 18, 35 26, 50 10 C 65 5, 72 12, 80 2');
+
   return `
     <div class="kpi-card ${color}">
       <div class="kpi-card-top">
@@ -41,6 +47,9 @@ export function renderKPICard({ label, value, sub, color = 'indigo', icon = 'mon
       <div class="kpi-label">${label}</div>
       <div class="kpi-value" data-animate>${displayValue}</div>
       ${sub ? `<div class="kpi-sub">${sub}</div>` : ''}
+      <svg class="kpi-sparkline" viewBox="0 0 80 30">
+        <path d="${sparklinePath}" />
+      </svg>
     </div>
   `;
 }

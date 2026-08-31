@@ -26,8 +26,8 @@ let allFilteredColumns = [];
 
 // ---------- HELPERS ----------
 
-const badgeConciliacao = (s) => `<span class="badge ${s === 'OK' ? 'badge-ok' : s === 'Pendente' ? 'badge-pendente' : 'badge-divergente'}">${s}</span>`;
-const badgeFat = (s) => `<span class="badge ${s === 'FECHADA' || s === 'Fechada' ? 'badge-fechada' : 'badge-confirmada'}">${s}</span>`;
+const badgeConciliacao = (s) => `<span class="badge ${s === 'OK' ? 'badge-ok' : s === 'Pendente' ? 'badge-pendente' : 'badge-divergente'}"><span class="badge-dot"></span>${s}</span>`;
+const badgeFat = (s) => `<span class="badge ${s === 'FECHADA' || s === 'Fechada' ? 'badge-fechada' : 'badge-confirmada'}"><span class="badge-dot"></span>${s}</span>`;
 
 function getColumns() {
   return [

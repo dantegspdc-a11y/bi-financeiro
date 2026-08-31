@@ -26,7 +26,40 @@ const inlineDataLabelsPlugin = {
   }
 };
 
-Chart.register(...registerables, inlineDataLabelsPlugin);
+// Custom inline plugin to draw central text in Doughnut charts
+const doughnutCenterTextPlugin = {
+  id: 'doughnutCenterText',
+  beforeDraw(chart) {
+    if (chart.config.type !== 'doughnut') return;
+    const { ctx, chartArea } = chart;
+    if (!chartArea) return;
+    const { left, top, width, height } = chartArea;
+    const total = chart.config.data.datasets[0].data.reduce((a, b) => a + (b || 0), 0);
+    if (!total) return;
+
+    ctx.save();
+    const centerX = left + width / 2;
+    const centerY = top + height / 2;
+
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    // Label "TOTAL CONSOLIDADO"
+    ctx.font = "600 10px 'Inter', sans-serif";
+    ctx.fillStyle = '#94a3b8';
+    ctx.fillText('TOTAL CONSOLIDADO', centerX, centerY - 10);
+
+    // Formatted Value
+    const formatted = 'R$ ' + (total >= 1000000 ? (total / 1000000).toFixed(1) + 'M' : total >= 1000 ? (total / 1000).toFixed(0) + 'K' : Math.round(total).toLocaleString('pt-BR'));
+    ctx.font = "800 14px 'Inter', sans-serif";
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(formatted, centerX, centerY + 10);
+
+    ctx.restore();
+  }
+};
+
+Chart.register(...registerables, inlineDataLabelsPlugin, doughnutCenterTextPlugin);
 
 const chartInstances = {};
 

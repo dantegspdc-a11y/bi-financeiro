@@ -183,16 +183,55 @@ a:hover { text-decoration: underline; }
 
 .header {
   height: var(--header-height); min-height: var(--header-height);
-  background: var(--bg-surface); border-bottom: 1px solid var(--border-subtle);
+  background: rgba(9, 10, 15, 0.6) !important;
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(30, 41, 59, 0.5);
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 24px;
 }
 
-.header-left { display: flex; align-items: center; gap: 16px; }
+.header-left { display: flex; flex-direction: column; justify-content: center; gap: 2px; }
+.header-breadcrumb {
+  font-size: 0.75rem;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.header-breadcrumb span { color: #94a3b8; font-weight: 500; }
 .header-logo { height: 28px; width: auto; display: none; }
-.header-title { font-size: 1.25rem; font-weight: 600; color: var(--text-primary); }
+.header-title { font-size: 1.15rem; font-weight: 600; color: #ffffff; letter-spacing: -0.01em; }
 
-.header-timestamp { font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+.header-timestamp { font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
+
+/* Status Live Pulsante */
+.status-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #34d399;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  background-color: #34d399;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #34d399;
+  animation: pulseDot 2s infinite;
+}
+
+@keyframes pulseDot {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7); }
+  70% { transform: scale(1.05); box-shadow: 0 0 0 6px rgba(52, 211, 153, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+}
 
 /* ---------- CONTENT ---------- */
 .content {
@@ -543,17 +582,101 @@ a:hover { text-decoration: underline; }
 }
 .rank-top { background: var(--accent-indigo-soft); color: var(--accent-indigo); }
 
-/* ---------- BADGES ---------- */
+/* ---------- BADGES (SHADCN GLOW DOTS STYLE) ---------- */
 .badge {
-  display: inline-flex; align-items: center; padding: 4px 10px;
-  border-radius: 4px; font-size: 0.75rem; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px;
+  border-radius: 20px; font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 0.02em; border: 1px solid transparent;
 }
-.badge-ok { background: var(--accent-emerald-soft); color: var(--accent-emerald); }
-.badge-pendente { background: var(--accent-amber-soft); color: var(--accent-amber); }
-.badge-divergente, .badge-vencido { background: var(--accent-red-soft); color: var(--accent-red); }
-.badge-avencer { background: rgba(59,130,246,.15); color: var(--accent-blue); }
-.badge-fechada { background: var(--accent-emerald-soft); color: var(--accent-emerald); }
-.badge-confirmada { background: var(--accent-amber-soft); color: var(--accent-amber); }
+.badge-dot {
+  width: 6px; height: 6px; border-radius: 50%; display: inline-block; flex-shrink: 0;
+}
+
+.badge-ok, .badge-fechada { 
+  background: rgba(52, 211, 153, 0.1) !important; color: #34d399 !important; border-color: rgba(52, 211, 153, 0.25) !important;
+}
+.badge-ok .badge-dot, .badge-fechada .badge-dot { background: #34d399; box-shadow: 0 0 6px #34d399; }
+
+.badge-pendente, .badge-confirmada { 
+  background: rgba(251, 191, 36, 0.1) !important; color: #fbbf24 !important; border-color: rgba(251, 191, 36, 0.25) !important;
+}
+.badge-pendente .badge-dot, .badge-confirmada .badge-dot { background: #fbbf24; box-shadow: 0 0 6px #fbbf24; }
+
+.badge-divergente, .badge-vencido { 
+  background: rgba(248, 113, 113, 0.1) !important; color: #f87171 !important; border-color: rgba(248, 113, 113, 0.25) !important;
+}
+.badge-divergente .badge-dot, .badge-vencido .badge-dot { background: #f87171; box-shadow: 0 0 6px #f87171; }
+
+.badge-avencer { 
+  background: rgba(96, 165, 250, 0.1) !important; color: #60a5fa !important; border-color: rgba(96, 165, 250, 0.25) !important;
+}
+.badge-avencer .badge-dot { background: #60a5fa; box-shadow: 0 0 6px #60a5fa; }
+
+/* ---------- SPARKLINE INLINE NOS KPIS ---------- */
+.kpi-sparkline {
+  position: absolute;
+  bottom: 14px;
+  right: 18px;
+  width: 72px;
+  height: 28px;
+  opacity: 0.85;
+  pointer-events: none;
+}
+.kpi-sparkline path {
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.kpi-card.emerald .kpi-sparkline path { stroke: #34d399; }
+.kpi-card.amber .kpi-sparkline path { stroke: #fbbf24; }
+.kpi-card.red .kpi-sparkline path { stroke: #f87171; }
+.kpi-card.indigo .kpi-sparkline path, .kpi-card.blue .kpi-sparkline path { stroke: #818cf8; }
+.kpi-card.cyan .kpi-sparkline path { stroke: #22d3ee; }
+
+/* ---------- INSIGHTS EXECUTIVE BANNER ---------- */
+.insights-banner {
+  background: linear-gradient(135deg, rgba(129, 140, 248, 0.12) 0%, rgba(52, 211, 153, 0.08) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 16px 22px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  backdrop-filter: blur(16px);
+}
+
+.insights-banner-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #ffffff;
+}
+.insights-banner-title svg { color: var(--accent-amber); }
+
+.insights-pills {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.insight-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: rgba(5, 6, 8, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  font-size: 0.78rem;
+  color: #cbd5e1;
+}
+.insight-pill strong { color: #ffffff; font-weight: 600; }
 
 /* ---------- UTILITY ---------- */
 .text-emerald { color: var(--accent-emerald); }

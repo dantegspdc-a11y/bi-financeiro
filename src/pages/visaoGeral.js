@@ -64,11 +64,27 @@ export function render() {
   ];
 
   const { kpiCards, tabelaResumo, tableColumns, destaquesHtml } = buildPage();
+  const kpis = calcularKPIs(currentFilters);
+
+  const insightsBannerHtml = `
+    <div class="insights-banner">
+      <div class="insights-banner-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <span>Resumo da Operação</span>
+      </div>
+      <div class="insights-pills">
+        <div class="insight-pill">Conversão: <strong>${formatarPct(kpis.taxaConversao)}</strong></div>
+        <div class="insight-pill">Ticket Médio: <strong>${formatarMoeda(kpis.ticketMedio)}</strong></div>
+        <div class="insight-pill">Saldo Projetado: <strong class="${kpis.saldoProjetado >= 0 ? 'text-emerald' : 'text-red'}">${formatarMoeda(kpis.saldoProjetado)}</strong></div>
+      </div>
+    </div>
+  `;
 
   return `
     <div class="page-enter">
       ${renderFilterBar({ id: 'filter-vg', filters })}
       <div id="vg-content">
+        ${insightsBannerHtml}
         ${renderKPIGrid(kpiCards)}
         ${destaquesHtml}
         <div class="charts-grid">

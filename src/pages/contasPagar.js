@@ -36,7 +36,7 @@ function buildContent(filtros = {}) {
     { label: 'Prazo Médio', value: `${prazoMedio} dias`, color: 'blue', icon: 'calendar', isCurrency: false, sub: 'emissão ao vencimento' },
   ];
 
-  const badgeStatus = (s) => `<span class="badge ${s === 'Vencido' ? 'badge-vencido' : s === 'Pago' ? 'badge-ok' : 'badge-avencer'}">${s}</span>`;
+  const badgeStatus = (s) => `<span class="badge ${s === 'Vencido' ? 'badge-vencido' : s === 'Pago' ? 'badge-ok' : 'badge-avencer'}"><span class="badge-dot"></span>${s}</span>`;
 
   const columns = [
     { key: 'beneficiario', label: 'Fornecedor' },

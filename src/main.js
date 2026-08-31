@@ -49,9 +49,13 @@ function renderLayout() {
       <div class="main-area">
         <header class="header" id="header">
           <div class="header-left">
+            <div class="header-breadcrumb">Financeiro / <span id="header-breadcrumb-page">${getPageTitle(currentPage)}</span></div>
             <h2 class="header-title" id="header-title">${getPageTitle(currentPage)}</h2>
           </div>
           <div class="header-filters" id="header-filters">
+            <div class="status-live-badge" title="Conexão ativa com banco Supabase">
+              <span class="status-dot"></span> Sincronizado
+            </div>
             <button class="btn btn-outline btn-sm" id="btn-kiosk" title="Modo Quiosque — rotação automática de páginas">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
               Quiosque
@@ -79,7 +83,9 @@ function renderPage(pageId) {
   });
 
   const headerTitle = document.getElementById('header-title');
+  const headerBcPage = document.getElementById('header-breadcrumb-page');
   if (headerTitle) headerTitle.textContent = getPageTitle(pageId);
+  if (headerBcPage) headerBcPage.textContent = getPageTitle(pageId);
 
   // Restore sidebar/header if hidden by report mode
   const sidebar = document.getElementById('sidebar');
